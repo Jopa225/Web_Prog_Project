@@ -1,0 +1,15 @@
+ul a:hover{
+  background-color: blueviolet;
+}
+hr {
+  border: 10px solid purple;
+}
+main{
+  margin-top: 80px;
+}
+#chart_streamed{
+  background-color: black ;
+}
+#chart_watched{
+   background-color: black ;
+}
