@@ -13,6 +13,7 @@
 
 
   <title>Twitch Tracker</title>
+  <pre id='object'></pre>
 
 
 </head>
@@ -40,13 +41,13 @@
         <div class="collapse navbar-collapse" id="navmenu">
           <ul class="navbar-nav ms-auto ">
             <li class="nav-item">
-              <a href="#hr" class="nav-link"> League of Legends</a>
+              <a href="#hr" class="nav-link"> Top Games</a>
             </li>
             <li class="nav-item">
-              <a href="#something" class="nav-link"> Something</a>
+              <a href="#hr2" class="nav-link"> Live Streams</a>
             </li>
             <li class="nav-item">
-              <a href="#something2" class="nav-link"> Something 2</a>
+              <a href="#hr3" class="nav-link"> Search Clips</a>
             </li>
           </ul>
         </div>
@@ -83,7 +84,7 @@
           <div class="row mt-5">
             <div class="col ">
               <hr id="hr" />
-
+    
             </div>
           </div>
         </div>
@@ -103,7 +104,7 @@
             <img class="card-img-top" alt="Card image">
             <div class="card-body">
               <h5 class="card-title"></h5>
-              <h4 id="card-text" class="card-text fw-bold"></h4>
+              <h4 id="card-text" class="card-text fw-bold"> IDEMOO NIIIŠ</h4>
               <a id= "btn5" class="btn btn-light">See Streamers</a>
             </div>
           </div>
@@ -203,14 +204,7 @@
 
 
     </section>
-    <div class="container-fluid">
-      <div class="row mt-5">
-        <div class="col ">
-          <hr id="hr" />
-
-        </div>
-      </div>
-    </div>
+   
 
 
     </div>
@@ -219,22 +213,53 @@
 
 
     <div class="container mb-5">
-      <div class="row ">
-        <div class="col-lg-6">
-          <div id="chart_streamed">
+      
+        
+        <div class="container-fluid">
+          <div class="row mt-5">
+            <div class="col ">
+              <hr id="hr2" />
+    
+            </div>
+          </div>
+        </div>
 
-            <canvas id="myChart" width="400" height="320"></canvas>
+        <div class="p-4 h-50 d-flex justify-content-center">
+          <h4 class="fw-bold">Top Twitch Live Streams</h4>
+        </div>
+       <div id= "streams"class="streams"></div>
+       </div>
+
+
+       <div class="container mb-5">
+      
+        
+        <div class="container-fluid">
+          <div class="row mt-5">
+            <div class="col ">
+              <hr id="hr3" />
+    
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-5 bg-dark">
+          <div class="col p-5 h-100 bg-dark text-white rounded">
+            <h4>Search for your favourite game and get most viewed Twitch video clips</h4>
+  
+          </div>
+
+          <div class="col h-200">
+            <div class="input-group form-control-lg mt-5 ">
+              <input id="search-input" type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+              <button  id="search-btn" type="button" class="btn btn-outline-primary">Search</button>
+            </div>
           </div>
 
 
+        </div>
+        <div id= "clips"class="clips"></div>
 
-        </div>
-        <div class="col-lg-6  ">
-          <div id="chart_watched">
-            <canvas id="hoursWatched_Chart" width="400" height="320"></canvas>
-          </div>
-          </col-md-5>
-        </div>
   </main>
 
   <footer class="footer mt-auto py-3 bg-dark text-white">
@@ -253,8 +278,9 @@
           <h3>
             Official Twitch webpages:
           </h3>
-          <a href="https://www.facebook.com/Twitch" class="fa fa-facebook"></a>
-          <a href="https://www.instagram.com/twitch/" class="fa fa-instagram"></a>
+          <a href="https://www.facebook.com/Twitch" target=”_blank”  class="fa fa-facebook"></a>
+          <a href="https://www.instagram.com/twitch/" target=”_blank”  class="fa fa-instagram"></a>
+          <a href="https://www.twitch.tv/"  target=”_blank” class="fa fa-twitch"></a>
 
 
 
@@ -263,15 +289,82 @@
       </div>
     </div>
   </footer>
+
+
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="main.js"></script>
-
+ 
+<script src="main.js"></script>
 
 </body>
+
+
+<script type="module">
+
+  
+
+ // Import the functions you need from the SDKs you need
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-app.js";
+  import { getDatabase, onValue,  ref} from "https://www.gstatic.com/firebasejs/9.8.3/firebase-database.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.8.3/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAORhqzIRhTPYlf65Dbr6XTt5Qch4OEb4c",
+    authDomain: "twitch-3ea07.firebaseapp.com",
+    databaseURL: "https://twitch-3ea07-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "twitch-3ea07",
+    storageBucket: "twitch-3ea07.appspot.com",
+    messagingSenderId: "696570535677",
+    appId: "1:696570535677:web:f2659a4ec139db172fe894",
+    measurementId: "G-LCC542CHJM"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db= getDatabase();
+
+  
+  var delayInMilliseconds = 1000; 
+
+
+
+const images = document.querySelectorAll(".card-img-top");
+
+let names= document.querySelectorAll(".card-text");
+setTimeout(function() {
+
+  for(let i=0; i<10;i++){
+        const getreference= ref(db, "Images/"+names[i].innerHTML+"/url");
+      
+        onValue(getreference, (snapshot)=> {
+          const firebaseData= snapshot.val();
+
+        
+          images[i].src = firebaseData;
+          console.log(i);
+
+      })
+  }
+
+}, delayInMilliseconds);
+
+
+
+
+  
+
+ 
+</script>
 
 </html>
