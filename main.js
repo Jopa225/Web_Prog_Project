@@ -1,87 +1,3 @@
-const options = {
-  method: "GET",
-  headers: {
-    "X-RapidAPI-Host": "twitch-game-popularity.p.rapidapi.com",
-    "X-RapidAPI-Key": "cf49ec9e29msh35435f471735eabp1888efjsn7893b4102aea",
-  },
-};
-
-fetch(
-  "https://twitch-game-popularity.p.rapidapi.com/game?name=League%20of%20Legends&year=2020&month=08",
-  options
-)
-  .then((response) => response.json())
-  .then((response) => {
-    console.log(response);
-    let hours_streamed = [],
-      hours_watched = [];
-    for (let i = 0; i < 12; i++) {
-      hours_streamed[i] = parseInt(response[i].Hours_Streamed.substring(0, 7));
-      hours_watched[i] = parseInt(response[i].Hours_watched.substring(0, 9));
-    }
-    console.log(response);
-
-    var canvasElement = document.getElementById("myChart");
-    var config = {
-      type: "bar",
-      data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ],
-        datasets: [
-          {
-            label: "League of Legends hours streamed ",
-            data: hours_streamed,
-
-            backgroundColor: ["rgba(145, 70, 255, 0.6)"],
-          },
-        ],
-      },
-    };
-
-    var canvasElement_watched = document.getElementById("hoursWatched_Chart");
-    var config_watched = {
-      type: "bar",
-      data: {
-        labels: [
-          "January",
-          "February",
-          "March",
-          "April",
-          "May",
-          "June",
-          "July",
-          "August",
-          "September",
-          "October",
-          "November",
-          "December",
-        ],
-        datasets: [
-          {
-            label: "League of Legends hours watched",
-            data: hours_watched,
-
-            backgroundColor: ["rgba(255, 255, 0, 0.6)"],
-          },
-        ],
-      },
-    };
-    var myChart = new Chart(canvasElement, config);
-    var watched_chart = new Chart(canvasElement_watched, config_watched);
-  })
-  .catch((err) => console.error(err));
 
 let clinetId = "zmtww3yjqc87lr229fxonycyh4cahy";
 let clinetSecret = "jta94k9tfuufuj9jjaoyw8xfsbvm4q";
@@ -98,8 +14,8 @@ function getTwitchAuthorization() {
     });
 }
 
-async function getStreams() {
-  const endpoint = "https://api.twitch.tv/helix/games/top";
+async function getGames() {
+  const endpoint = "https://api.twitch.tv/helix/games/top?first=10";
 
   let authorizationObject = await getTwitchAuthorization();
   let { access_token, expires_in, token_type } = authorizationObject;
@@ -124,9 +40,10 @@ async function getStreams() {
       for (let i = 0; i < 10; i++) {
         console.log(data.data[i].name);
       }
+      
       setName(data);
-      setImage(data);
       seeStreamers(data);
+      return data;
     });
 }
 
@@ -159,7 +76,7 @@ async function getDetails() {
 }
 
 async function getDetails(game) {
-  const endpoint = "https://api.twitch.tv/helix/search/channels?query=" + game;
+  const endpoint = "https://api.twitch.tv/helix/search/channels?first=5&query=" + game;
 
   let authorizationObject = await getTwitchAuthorization();
   let { access_token, expires_in, token_type } = authorizationObject;
@@ -200,6 +117,119 @@ async function getDetails(game) {
     
     });
 }
+async function getStreams() {
+  const endpoint = "https://api.twitch.tv/helix/streams?first=9";
+
+  let authorizationObject = await getTwitchAuthorization();
+  let { access_token, expires_in, token_type } = authorizationObject;
+
+  //token_type first letter must be uppercase    
+  token_type =
+  token_type.substring(0, 1).toUpperCase() +
+  token_type.substring(1, token_type.length);
+
+  let authorization = `${token_type} ${access_token}`;
+
+  let headers = {
+  authorization,
+  "Client-Id": clinetId,
+  };
+  
+
+  fetch(endpoint, {
+  headers,
+  })
+  .then((res) => res.json())
+  .then((data) => 
+  renderStreams(data));
+}
+
+
+
+async function getClips(game) {
+  const endpoint = "https://api.twitch.tv/helix/clips?first=6&game_id="+game;
+
+  let authorizationObject = await getTwitchAuthorization();
+  let { access_token, expires_in, token_type } = authorizationObject;
+
+  //token_type first letter must be uppercase    
+  token_type =
+  token_type.substring(0, 1).toUpperCase() +
+  token_type.substring(1, token_type.length);
+
+  let authorization = `${token_type} ${access_token}`;
+
+  let headers = {
+  authorization,
+  "Client-Id": clinetId,
+  };
+
+  fetch(endpoint, {
+  headers,
+  })
+  .then((res) => res.json())
+  .then((data) => 
+      renderClips(data)
+
+  
+  );
+  
+}
+
+function renderClips(data) {
+
+  let { data: streams } = data;
+  let streamsContainer = document.querySelector("div.clips");
+
+  streams.forEach((stream) => {
+  let { thumbnail_url, url, view_count, broadcaster_name } = stream;
+  let hdThumbnail = thumbnail_url
+      .replace("{width}", "1920")
+      .replace("{height}", "1080");
+  streamsContainer.innerHTML += `
+  
+ <div class=" card bg-dark" style="width:400px">
+            <img class="card-img-top" alt="Card image" src= "${hdThumbnail}">
+            <div class="card-body">
+              <h5 class="card-title">Streamer: ${broadcaster_name}</h5>
+              <a href=${url} target="_blank" class="card-text fw-bold">${url}</a>
+              <h5 class="card-title">${view_count} times watched</h5>
+            </div>
+          </div>
+
+  `;
+  
+  });
+}
+
+
+function renderStreams(data) {
+
+  let { data: streams } = data;
+  let streamsContainer = document.querySelector("div.streams");
+
+  streams.forEach((stream) => {
+  let { thumbnail_url, game_name, viewer_count, user_name } = stream;
+  let hdThumbnail = thumbnail_url
+      .replace("{width}", "1920")
+      .replace("{height}", "1080");
+  streamsContainer.innerHTML += `
+  
+ <div class=" card bg-dark" style="width:400px">
+            <img class="card-img-top" alt="Card image" src= "${hdThumbnail}">
+            <div class="card-body">
+              <h5 class="card-title">Streamer: ${user_name}</h5>
+              <h4 class="card-text fw-bold">${game_name}</h4>
+              <h5 class="card-title">${viewer_count} watching</h5>
+            </div>
+          </div>
+
+  `;
+  
+  });
+}
+
+getStreams();
 
 async function getSubCount() {
   const endpoint = "https://api.twitch.tv/helix/users/follows?to_id=23161357";
@@ -238,24 +268,9 @@ function setName(data) {
   });
 }
 
-function setImage(data) {
-  let i = 0;
-  const images = document.querySelectorAll(".card-img-top");
 
-  images.forEach((e) => {
-    if (data.data[i].name === "Counter-Strike: Global Offensive") {
-      e.src = "CS.jpg";
-    }
-    if (data.data[i].name == "Call of Duty: Warzone") {
-      e.src = "Fortnite.jpg";
-    }
 
-    e.src = data.data[i].name + ".jpg";
-    i++;
-  });
-}
-
-getStreams();
+getGames();
 
 var swiper = new Swiper(".mySwiper", {
   slidesPerView: 3,
@@ -286,4 +301,41 @@ function seeStreamers(data) {
       getDetails(data.data[j].name);
     });
   }
+}
+
+document.getElementById("search-btn").addEventListener("click", searchClips);
+
+function searchClips() {
+  $("#clips").empty();
+  let input= document.getElementById("search-input").value;
+  getGameID(input);
+}
+
+async function getGameID(game){
+
+  const endpoint =
+  "https://api.twitch.tv/helix/games?name="+game;
+
+let authorizationObject = await getTwitchAuthorization();
+let { access_token, expires_in, token_type } = authorizationObject;
+
+//token_type first letter must be uppercase
+token_type =
+  token_type.substring(0, 1).toUpperCase() +
+  token_type.substring(1, token_type.length);
+
+let authorization = `${token_type} ${access_token}`;
+
+let headers = {
+  authorization,
+  "Client-Id": clinetId,
+};
+
+fetch(endpoint, {
+  headers,
+})
+  .then((res) => res.json())
+  .then((data) => {
+    getClips(data.data[0].id);
+  });
 }
