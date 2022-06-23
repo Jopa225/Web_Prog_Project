@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,6 +41,19 @@
 
         </button>
 
+   <?php 
+                if(isset($_SESSION["useruid"])){
+                    echo "<h4 class='text-success' >Welcome ". $_SESSION["useruid"] .  "</h4>";
+
+
+                }
+                
+            ?>
+
+
+     
+        
+
         <div class="collapse navbar-collapse" id="navmenu">
           <ul class="navbar-nav ms-auto ">
             <li class="nav-item">
@@ -49,6 +65,15 @@
             <li class="nav-item">
               <a href="#hr3" class="nav-link"> Search Clips</a>
             </li>
+            <?php 
+                if(isset($_SESSION["useruid"])){
+                    echo "<li class='nav-item'>
+                    <a href='logout.inc.php' class='nav-link'> Log Out</a>  </li>";
+
+
+                }
+                
+            ?>
           </ul>
         </div>
 
